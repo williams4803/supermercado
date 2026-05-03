@@ -1,0 +1,118 @@
+diff --git a/Model/Funcionario.cs b/Model/Funcionario.cs
+--- a/Model/Funcionario.cs
++++ b/Model/Funcionario.cs
+@@
+-        public string? Endereço { get; set; }
++        public string? Endereco { get; set; }
+diff --git a/Migrations/20250112234154_BancoSupermercado.Designer.cs b/Migrations/20250112234154_BancoSupermercado.Designer.cs
+--- a/Migrations/20250112234154_BancoSupermercado.Designer.cs
++++ b/Migrations/20250112234154_BancoSupermercado.Designer.cs
+@@
+-using Supermercado.Context;
++using Supermercado.Data;
+@@
+-    [DbContext(typeof(TabelaContext))]
++    [DbContext(typeof(ApplicationDbContext))]
+@@
+-                    b.Property<string>("Endereço")
+-                        .HasColumnType("nvarchar(max)");
++                    b.Property<string>("Endereco")
++                        .HasColumnType("nvarchar(max)");
+diff --git a/Migrations/TabelaContextModelSnapshot.cs b/Migrations/TabelaContextModelSnapshot.cs
+--- a/Migrations/TabelaContextModelSnapshot.cs
++++ b/Migrations/TabelaContextModelSnapshot.cs
+@@
+-using Supermercado.Context;
++using Supermercado.Data;
+@@
+-    [DbContext(typeof(TabelaContext))]
+-    partial class TabelaContextModelSnapshot : ModelSnapshot
++    [DbContext(typeof(ApplicationDbContext))]
++    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+@@
+-                    b.Property<string>("Endereço")
+-                        .HasColumnType("nvarchar(max)");
++                    b.Property<string>("Endereco")
++                        .HasColumnType("nvarchar(max)");
+diff --git a/Data/ApplicationDbContext.cs b/Data/ApplicationDbContext.cs
+new file mode 100644
+--- /dev/null
++++ b/Data/ApplicationDbContext.cs
+@@ -0,0 +1,28 @@
++using Microsoft.EntityFrameworkCore;
++using Supermercado.Model;
++
++namespace Supermercado.Data
++{
++    public class ApplicationDbContext : DbContext
++    {
++        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
++        {
++        }
++
++        public DbSet<Funcionario> Funcionarios { get; set; } = null!;
++        public DbSet<Produto> Produtos { get; set; } = null!;
++    }
++}
+diff --git a/Context/TabelaContext.cs b/Context/TabelaContext.cs
+--- a/Context/TabelaContext.cs
++++ b/Context/TabelaContext.cs
+@@
+-using Microsoft.EntityFrameworkCore;
+-using Supermercado.Model;
+-
+-namespace Supermercado.Context
+-{
+-    public class TabelaContext : DbContext
+-    {
+-        public TabelaContext(DbContextOptions<TabelaContext> options) : base(options) 
+-        {
+-        
+-        }
+-        public DbSet<Funcionario> Funcionarios { get; set; }
+-        public DbSet<Produto> Produtos { get; set; }
+-
+-    }
+-}
++using System;
++using Microsoft.EntityFrameworkCore;
++using Supermercado.Model;
++
++namespace Supermercado.Data
++{
++    [Obsolete("Use ApplicationDbContext instead.")]
++    public class TabelaContextLegacy : DbContext
++    {
++        public TabelaContextLegacy(DbContextOptions<TabelaContextLegacy> options) : base(options)
++        {
++        }
++
++        public DbSet<Funcionario> Funcionarios { get; set; } = null!;
++        public DbSet<Produto> Produtos { get; set; } = null!;
++
++    }
++}
+diff --git a/Program.cs b/Program.cs
+--- a/Program.cs
++++ b/Program.cs
+@@
+-using Microsoft.EntityFrameworkCore;
+-using Supermercado.Context;
+-
+-var builder = WebApplication.CreateBuilder(args);
+-
+-// Add services to the container.
+-builder.Services.AddDbContext<TabelaContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conectarPadrao")));
++using Microsoft.EntityFrameworkCore;
++using Supermercado.Data;
++
++var builder = WebApplication.CreateBuilder(args);
++
++// Add services to the container.
++builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("conectarPadrao")));
+diff --git a/Migrations/20250112234154_BancoSupermercado.cs b/Migrations/20250112234154_BancoSupermercado.cs
+--- a/Migrations/20250112234154_BancoSupermercado.cs
++++ b/Migrations/20250112234154_BancoSupermercado.cs
+@@
+-                    Endereço = table.Column<string>(type: "nvarchar(max)", nullable: true),
++                    Endereco = table.Column<string>(type: "nvarchar(max)", nullable: true),
